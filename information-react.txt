@@ -1,0 +1,32 @@
+Hi so on the first day of frontend part of our tech notes mern stack project we are here to learn something new about react-router-dom .
+In React Router (a popular library for routing in React applications), there are two commonly used methods for creating routers: BrowserRouter and createBrowserRouter. These are part of different versions of React Router .
+BrowserRouter (React Router v5 and earlier, also available in v6)
+createBrowserRouter (React Router v6.4 and later)
+We are here focusing on  createBrowserRouter and we already are familiar with it and also it is the latest one so yeah the new takeaway from this topic is index :
+
+In React Router, setting index: true in a route configuration indicates that the route is the default (or index) route for its parent path. This means that when the parent route is matched, and no more specific child route is provided in the URL, the index route will be rendered.
+
+Parent Route: A route that can contain child routes.
+Index Route: The default child route that is rendered when the parent route is matched but no specific child path is provided.
+
+
+
+I am not very much aware of the UI and structure of the app we are creating so heading with all the basics .
+using createBrowserRouter for routing in our application .
+created a couple of components with only some boiler plate code like login page component , public component , A dashboard layout component that has children components in a protected part and header and footer as common and unprotected part of application.
+
+
+
+Also we have installed @fortawesome/fontawesome-svg-core this package in our project :  . This package is specifically designed to work with SVG icons in a way that is efficient, flexible, and customizable.
+
+@fortawesome/react-fontawesome is a package designed to integrate Font Awesome icons seamlessly into React applications. It provides a React component (FontAwesomeIcon) that allows you to easily include and manipulate Font Awesome icons in your React components.
+
+
+
+
+
+While doing the basics of routing using react-router-dom , I got a clear understanding of how Outlet (<Outlet />: This component is used within a layout component to specify where the child routes should be rendered)component works . The <Outlet /> serves as a placeholder for where the child routes will be rendered. so make sure to have it in the places where you want your child components to be rendered inside the parent component.
+
+
+
+

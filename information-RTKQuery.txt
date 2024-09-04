@@ -1,0 +1,263 @@
+There is something new we are going to learn in this project as well :
+
+RTK query :
+RTK Query is a powerful data-fetching and caching tool that is built into Redux Toolkit.
+RTK Query is an optional addon included in the Redux Toolkit package, and its functionality is built on top of the other APIs in Redux Toolkit.
+RTK Query Simplifies API calls with automatic caching and synchronization.
+Automatically caches responses to avoid redundant requests.
+Automatically refetches data when certain conditions are met, like cache invalidation.
+
+Before you get into RTK query make sure you know everything about those store , slices , createSlice , configureStore, useSelector , dispatch() , Provider - everything related to react-redux and redux toolkit.
+A small but clear defination to slices in redux :Redux Toolkit (RTK) introduced the concept of "slices" to simplify the process of creating reducers, actions, and selectors associated with a particular piece of state.A slice manages a specific portion of the Redux store's state. A slice defines a set of reducer functions that describe how the state should change in response to actions.A slice defines the initial state for its specific part of the Redux store.You can create selectors within a slice to extract specific pieces of the state.
+Redux Toolkit automatically generates action creators corressponding to each reducer in the slice.
+
+
+
+The core concept in RTK query is :
+1. createApi -  The primary API slice creation function in RTK Query. It defines endpoints, tags, and how requests are made.
+2. fetchBaseQuery - A lightweight wrapper around fetch that can be used as the baseQuery for your API slice.It automatically handles basic request concerns like setting headers and base URLs.
+Purpose of fetchBaseQuery:
+Simplifies Request Logic: Instead of writing the same fetch logic repeatedly, fetchBaseQuery abstracts it into a reusable function.
+Handles Base URL: It allows you to define a base URL once, so you don't have to specify it in every API call.
+Manages Headers: You can easily configure default headers for requests, like authentication tokens.
+Automatic Parsing: It automatically parses JSON responses, saving you the need to call response.json() every time.
+
+
+
+3. Endpoints: There are two types : Query Endpoints and Mutation Endpoints.
+   Query Endpoints: Used to fetch and cache data.
+   Mutation Endpoints: Used to send data to the server (e.g., creating, updating, or deleting).
+4. Tags: Tags are used to manage cache invalidation and refetching.Assign tags to endpoints so that related data can be invalidated and refetched when needed.
+5.Hooks:RTK Query automatically generates React hooks for each endpoint.
+
+
+These were some basic things related to RTK Query , Now let us see how this project is using RTK query.
+Install redux toolkit(@reduxjs/toolkit) and react-redux in your project
+
+We have this folder "app" in our project where we will have an apiSlice.js .
+That is fine , the apiSlice is fine . This file looks fine as createApi is something related to RTK Query where you are defining a baseURl for your API calls , tags for cache invalidation , endpoints to fetch or mutate the data .
+
+Now let us solve the mystry of this not looking so usual store.js file . 
+
+
+
+1. configureStore : We already know about this as we have used it previously too . This is a function from Redux Toolkit (RTK) that simplifies the process of setting up a Redux store. It automatically includes some useful middleware and sets up the Redux DevTools.
+
+
+
+2.  reducer : {
+        [apiSlice.reducerPath] : apiSlice.reducer,
+    },
+    
+    I don't know what is this . All I know is about reducer object that we have in the store . Store has this one reducer used to update data of store. This one big reducer consists of small reducers from different slices as each slice will have its own reducers.
+    
+    
+    
+3. middleware: getDefaultMiddleware =>
+    getDefaultMiddleware().concat(apiSlice.middleware),
+    
+    
+    getDefaultMiddleware: This is a function that provides the default middleware for Redux (e.g., redux-thunk).
+    apiSlice.middleware: This is the middleware provided by RTK Query. It manages caching, automatic re-fetching, and other aspects of making API calls.
+    .concat(apiSlice.middleware): Adds the RTK Query middleware to the default middleware stack.
+    This setup ensures that RTK Query's features, like caching and automatic refetching, work correctly.
+    
+    
+Now let us provide this store to our app.
+
+
+Two very key concepts in RTK query are :
+createSelector and  createEntityAdapter
+Let us dive a little deeper in these concepts :
+
+1.   createSelector - It is a function provided by redux toolkit that allows you to create memoized selectors. 
+now as you should already know selectors are functions that extract and return a specific piece of data from the Redux store and Memoization is a technique that helps optimize performance by caching the result of a function call and returning the cached result when the same inputs occur again.
+
+so How createSelector Works:
+
+const selectUsers = state => state.users;
+this is a basic selector function that is extracting users state of a slice.
+Now when you wrap this selector with createSelector , it creates a memoized selector.It takes an input selector and a transformation function as arguments.
+
+const selectUserNames = createSelector([selectUsers] ,users => users.map(user => user.name))
+
+selectUsers is an input selector function for createSelector and selectUserNames is a memoized selector.
+
+
+In a basic selector, React components subscribed to the store will re-render when the relevant slice of the state changes. However, there are key differences between using a basic selector and a memoized selector like the one created with createSelector from Redux Toolkit.
+In a simple selector, every time the component re-renders, the selector function is called again, and it recomputes its result, regardless of whether the input data (users array) has changed or not.Even if the users array hasn't changed, the selector still runs through the map operation, which can be wasteful if it's an expensive operation or if there are many users.
+
+const selectUserNames = state => state.users.map(user => user.name);
+In this case, map is executed on every render, which could lead to performance issues in more complex scenarios.
+With createSelector, the selector only recomputes its result when its input selectors (selectUsers) return a new value. If the users array hasn't changed, createSelector returns the last computed result without running the map function again.
+This means that if the users array is unchanged, the memoized selector won't recompute the userNames array, reducing the amount of work your application needs to do.
+
+
+
+
+Now let us study about createEntityAdapter in depth :
+
+
+As we know RTK Query is the latest addition to Redux Toolkit, introduced to simplify data fetching, caching, and synchronization with server data. It's designed to reduce boilerplate code and improve the developer experience when working with APIs.
+
+
+createEntityAdapter integrates well with RTK query.
+
+Let us see how and let's understand it in depth :
+
+createEntityAdapter : This function simplifies the process of managing normalized state. It creates a set of functions (selectors and reducers) for managing entity collections (like an array of users).
+The adapter provides an initial state, which includes properties like ids (an array of entity IDs) and entities (an object mapping IDs to entities).
+
+
+
+Normalized State: In the context of Redux, a normalized state means that instead of storing data in a flat array or list, you structure it in a way that separates the unique IDs from the actual data.
+
+
+// Unnormalized state:
+const users = [
+  { id: 1, name: 'Alice', age: 25 },
+  { id: 2, name: 'Bob', age: 30 },
+  { id: 3, name: 'Charlie', age: 35 }
+];
+
+// Normalized state:
+const users = {
+  ids: [1, 2, 3],
+  entities: {
+    1: { id: 1, name: 'Alice', age: 25 },
+    2: { id: 2, name: 'Bob', age: 30 },
+    3: { id: 3, name: 'Charlie', age: 35 }
+  }
+};
+
+
+
+Why Normalize?
+Efficiency: It's easier to update, delete, or look up entities when they're stored by ID.
+Consistency: Normalized state helps avoid duplicating data across your state, which could lead to inconsistencies.
+
+
+
+
+
+createEntityAdapter helps you automatically set up a normalized structure for your state. It creates and manages the ids array and entities object for you.
+
+Provides Selectors and Reducers: It generates common selectors and reducers to interact with this normalized state, such as:
+Selectors: selectAll, selectById, selectIds—to easily get data from the state.
+Reducers: addOne, updateOne, removeOne—to handle common operations on the entities.
+
+
+Normally, managing normalized state would require you to manually write reducers and selectors for handling the ids and entities. createEntityAdapter does this for you, reducing the amount of code you need to write and maintain.
+
+
+In essence, createEntityAdapter makes it easier and more efficient to manage large lists of items in Redux by automatically setting up a normalized state structure and providing tools to interact with that state.
+
+
+
+       
+
+
+
+
+Now let us understand about one more method that we are seeing alot in our code in context of RTK query and that is injectEndpoints.
+
+
+injectEndpoints is a method provided by RTK Query that allows you to dynamically add or modify API endpoints in an existing API slice. 
+This is particularly useful when you want to split your endpoints across multiple files or modules, making your codebase more modular and easier to manage.
+
+
+Base API Slice: You start by defining a base API slice using createApi. This slice will contain common configurations like the base URL and any default settings.
+
+Injecting Endpoints: You then use injectEndpoints to add or modify endpoints in this API slice. The injectEndpoints method returns a new API slice with the additional or modified endpoints.
+
+
+
+
+
+Let us see all in action now .
+we have already seen how we using a createApi to create an API slice (main one).
+
+Now let us have another file(userApiSlice.js) for modifying existing api slice with endpoint that will fetch all the users .
+
+
+
+getInitialState :This method is part of the createEntityAdapter utility in Redux Toolkit. it returns an initial state object that has the following structure:
+
+ids: An array that will hold the IDs of the entities. This is useful for ordering and iterating over the entities.
+entities: An object where each key is an entity's ID, and the value is the corresponding entity. This makes it quick and efficient to look up an entity by its ID.
+
+
+we have used this injectEndpoints method to modify existing API SLice so that it fetches or make a Get request to /users endpoint.
+
+
+Inside injectEndpoints we have an endpoint function that takes a builder object and This builder is used to define API endpoints.
+Returns an object where each key represents an endpoint and value describes the details of the endpoint.
+builder.query is used to create a query endpoint. If you were defining a mutation (for POST, PUT, DELETE requests), you would use builder.mutation.
+
+
+query: () => '/users':
+
+This defines the actual query configuration.
+The query function returns the relative URL to the resource you want to fetch. In this case, it returns '/users', which means it will send a GET request to the /users endpoint of the base URL defined in apiSlice.
+This URL is appended to the baseUrl defined in your original createApi slice.
+
+
+
+keepUnusedDataFor option in RTK Query is used to control how long the cached data for a query is kept in memory after the last component using it has unsubscribed (i.e., the component unmounts or stops needing the data).When you make a query in RTK Query, the data returned from the server is cached by default. This allows other components that might need the same data to access it without triggering another network request.
+
+By default, RTK Query keeps this cached data for 60 seconds after the last subscriber stops using it.
+keepUnusedDataFor allows you to customize this duration.
+
+
+The transformResponse function in RTK Query is a powerful option that allows you to preprocess or transform the data returned by the server before it gets stored in the Redux store.
+You can use it to modify, filter, or normalize the data as needed.
+The map function is used to iterate over each user object in this array.Inside the map function, the code adds an id property to each user object, setting it equal to the _id property.
+This is necessary if the server returns user objects with an _id property instead of id, but your application expects the id property to be present.
+
+
+
+In our code (userApiSlice.js) file we are using createEntityAdapter to Normalize data(array of users fetched from server) before storing it in store .
+
+
+ return userAdapter.setAll(initialState , loadedUsers) : After transforming the user objects, the code uses the usersAdapter.setAll method to normalize the data.
+ usersAdapter.setAll:
+This method takes two arguments:
+initialState: The initial state created by usersAdapter.getInitialState(), which is designed to store normalized data.
+loadedUsers: The array of user objects that have been processed by the map function.
+setAll then normalizes the loadedUsers into the ids and entities structure, which is more efficient for querying and updating specific users.
+
+
+
+
+
+Next comes is providesTags :
+
+It is also an option provided by RTK query .
+ After we have transformed the response that we have got from endpoint , we can associate specific data with certain tags.
+ These tags help RTK Query manage cache invalidation and ensure that your data stays up-to-date when it changes.
+ It helps RTK Query understand which parts of the cache might need to be invalidated when a mutation (e.g., creating, updating, or deleting data) occurs.
+
+Example scenarios about how do they work :
+
+You have a getUsers query that fetches all users, and one of the users has an ID of 123.
+The tag { type: 'User', id: '123' } is attached to this user.
+If you update the user's information, you invalidate the tag { type: 'User', id: '123' }.
+RTK Query will refetch data only for that specific user, not the entire list.
+If the entire list might be affected (like when adding or removing users), you can invalidate { type: 'User', id: 'LIST' }.
+
+
+
+There is something extra  info about createSelector that you can now give a thought to :
+It takes two arguments : one is the original selector -  you want to memoize and the result of that selector ( an object representing the entire state of the getUsers query. This object typically contains properties like data, isLoading, isError, etc.)
+const selectUserData = createSelector(
+    selectUserResults,
+    userResult => userResult.data
+    
+    
+)
+Inside the result function, you access usersResult.data. The data property contains the actual user data that was fetched by the getUsers query and processed by the transformResponse function.
+
+selectUserData - memoized selector
+
+
+
