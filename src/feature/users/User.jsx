@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom'
 
 
 const User = ({userId}) => {
-    const user = useSelector(state => selectUserById(state , userId) )
+    const user = useSelector(state => selectUserById(state , userId) );
     //  selectUserById - prebuilt selector given by createEntityAdapter - A selector function that fetches a specific user by ID from the Redux state.When you call getSelectors() on an entity adapter, it generates several useful selector functions for you, including selectUserById.
     // The useSelector hook calls the selectUserById function with the state and userId as arguments. The selectUserById function looks through the users slice of the state (or wherever the user data is stored) and returns the user object that matches the provided userId.
     const navigate = useNavigate()
