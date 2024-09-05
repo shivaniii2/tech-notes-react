@@ -5,7 +5,7 @@ const noteAdapter = createEntityAdapter({});
 const initialState = noteAdapter.getInitialState();
 
 // injectEndpoints  : a method provided by RTK Query to add or modify API endpoints in an existing API slice.
-export const noteApiSlice =  apiSlice.injectEndpoints({ // noteApiSlice represents an enhanced API slice that includes the getNotes endpoint.
+export const notesApiSlice =  apiSlice.injectEndpoints({ // notesApiSlice represents an enhanced API slice that includes the getNotes endpoint.
     endpoints: builder =>({     
         getNotes: builder.query({  // getNotes is an endpoint here for performing a GET request
             query : () => '/notes',
@@ -13,7 +13,7 @@ export const noteApiSlice =  apiSlice.injectEndpoints({ // noteApiSlice represen
                 return response.status === 200 && !result.isError
             },
             keepUnusedDataFor : 5,
-            transformErrorResponse : (responseData) => {
+            transformResponse : (responseData) => {
                 const loadedNotes = responseData.map((note) =>{
                     note.id = note._id
                     return note
@@ -47,12 +47,12 @@ export const noteApiSlice =  apiSlice.injectEndpoints({ // noteApiSlice represen
     })
 })
 
-export const {useGetNotesQuery} = noteApiSlice
+export const {useGetNotesQuery} = notesApiSlice
 // useGetNotesQuery - atomatically generated hook from an endpoint.
 // As soon as the component(using this hook) mounts (renders for the first time), useGetNotesQuery will automatically make an API request to fetch notes.
 
 
-export const selectNoteResults = noteApiSlice.endpoints.getNotes.select()
+export const selectNotesResults = notesApiSlice.endpoints.getNotes.select()
 
 // The select() method is provided by RTK Query and is available on each endpoint. It creates a selector function that can be used to extract the result of the getNotes query from the Redux store.
 // It works like selectors work in react that is they are used to access the data in components from a redux store.
@@ -60,14 +60,14 @@ export const selectNoteResults = noteApiSlice.endpoints.getNotes.select()
 
 
 
-const selectNoteData = createSelector(
-    selectNoteResults,
+const selectNotesData = createSelector(
+    selectNotesResults,
     noteResult => noteResult.data
     
 )
 
 
-export const {selectAll : selectAllNotes, selectById : selectNoteById,selectIds : selectNoteId} = noteAdapter.getSelectors(state => selectNoteData(state) ?? initialState)
+export const {selectAll : selectAllNotes, selectById : selectNotesById,selectIds : selectNoteIds} = noteAdapter.getSelectors(state => selectNotesData(state) ?? initialState)
 
 
 
