@@ -15,7 +15,6 @@ export const usersApiSlice = apiSlice.injectEndpoints({// userApiSlice represent
             validateStatus: (response, result) => {
                 return response.status === 200 && !result.isError
             },
-            keepUnusedDataFor: 5,
             transformResponse: responseData => {
                 const loadedUsers = responseData.map(user => {
                     user.id = user._id
@@ -43,14 +42,59 @@ export const usersApiSlice = apiSlice.injectEndpoints({// userApiSlice represent
                 } else return [{ type: 'User', id: 'LIST' }]
             }
         }),
+        
+        addNewUser : builder.mutation({
+            query : initialUserData => ({
+                url : '/users',
+                method:'POST',
+                body : {
+                    ...initialUserData
+                }
+            }),
+            invalidatesTags : [
+                {type: 'User' , id : "LIST"}
+            ]
+        }),
+        updateUser : builder.mutation ({
+            query : initialUserData => ({
+                url : '/users',
+                method : 'PATCH',
+                body : {
+                    ...initialUserData
+                }
+                
+                
+                
+            }),
+            invalidatesTags : (result , error , arg) => [ { type: 'User' , id: arg.id}]
+                
+            
+            
+        }) ,
+        deleteUser  : builder.mutation({
+            query : ({id}) => ({
+                url : '/users',
+                method : 'DELETE',
+                body : { id }
+                
+            }),
+            invalidatesTags: (result , error , arg) => [
+                {type : "User" , id: arg.id}
+            ]
+        })
     }),
 })
 
 export const {
     useGetUsersQuery,
+    useAddNewUserMutation,
+    useUpdateUserMutation,
+    useDeleteUserMutation
+    
 } = usersApiSlice
 
 // useGetUsersQuery - atomatically generated hook from an endpoint.
+// useEndpointnameQuery/Mutation : depends on type of query.
 // As soon as the component(using this hook) mounts (renders for the first time), useGetUsersQuery will automatically make an API request to fetch users.
 
 export const selectUsersResult = usersApiSlice.endpoints.getUsers.select()

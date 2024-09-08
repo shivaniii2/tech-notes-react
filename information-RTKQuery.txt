@@ -261,3 +261,30 @@ selectUserData - memoized selector
 
 
 
+
+Let us learn about the mutation part  of RTK query endpoint(as writtern in userApiSlice.js) file .
+The mutation part of this code is where new users are added, existing users are updated, or users are deleted from the backend, and the client-side Redux state is automatically updated using the invalidation system provided by RTK Query
+
+there is this  addNewUser Mutation : This mutation sends a POST request to the /users endpoint to add a new user.
+You already know that if its a get request it would be like builder.query but as this is a Post request it is builder.mutation
+The query function defines how the request is made. It sends the user data (initialUserData) to the backend using the HTTP POST method and attaches the data as the body of the request.
+InvalidatesTags: After a successful mutation, the cache tag { type: 'User', id: 'LIST' } is invalidated. This signals that the list of users (i.e., the cached user data) is outdated and needs to be refetched. It ensures that when a new user is added, the app will refetch the user list to stay up to date.
+
+
+
+Key Takeaway for the day :
+When you're using an implicit return in JavaScript, particularly with arrow functions, it means that the function will automatically return the result of the expression without needing an explicit return statement.
+For functions that have a single expression, you can omit the curly braces {} and the return keyword. In such cases, the value is automatically returned. However, if that single expression is an object, you need to wrap the object inside parentheses () to distinguish it from a function block (which uses {}).
+const getUser = () => { 
+    url: '/user',
+    method: 'GET'
+}
+
+In this case, JavaScript interprets {} as the function body, not as an object. It thinks you're writing code inside the function block, but there's no actual return happening, so the function returns undefined.
+
+const getUser = () => ({
+    url: '/user',
+    method: 'GET'
+});
+Here, wrapping the object in parentheses tells JavaScript that you're returning an object and not starting a new function block. Now, the function will implicitly return the object.
+
