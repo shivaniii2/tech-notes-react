@@ -42,11 +42,51 @@ export const notesApiSlice =  apiSlice.injectEndpoints({ // notesApiSlice repres
                 }
             }
             
+        }),
+        addNewNote : builder.mutation({
+           query : initialNote => ({
+            url : '/notes',
+            method : 'POST',
+            body : {
+            ...initialNote
+            }
+           }
+            
+           ), 
+           invalidatesTags : [
+            {type :'Note' , id : 'LIST'}
+           ]
+        }),
+        updateNote : builder.mutation({
+            query : initialNote => ({
+                url: "notes",
+                method:'PATCH',
+                body : {
+                    ...initialNote
+                }
+                
+            }),
+            invalidatesTags : (result , error , arg) => [
+                {type : 'Note' , id : arg.id}
+            ]
+                
+            
+        }),
+        deleteNote : builder.mutation({
+            query : ({id})  => ({
+                url : "/notes",
+                method : 'DELETE',
+                body : {id}
+            }),
+            invalidatesTags : (result, error , arg) => [
+                {type : 'Note' , id : arg.id }
+            ]
         })
+        
     })
 })
 
-export const {useGetNotesQuery} = notesApiSlice
+export const {useGetNotesQuery , useAddNewNoteMutation , useUpdateNoteMutation , useDeleteNoteMutation} = notesApiSlice
 // useGetNotesQuery - atomatically generated hook from an endpoint.
 // As soon as the component(using this hook) mounts (renders for the first time), useGetNotesQuery will automatically make an API request to fetch notes.
 

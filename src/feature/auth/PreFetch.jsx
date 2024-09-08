@@ -2,12 +2,14 @@ import { useEffect } from "react"
 import { store } from '../../app/store';
 import { notesApiSlice } from "../notes/notesApiSlice";
 import { Outlet } from "react-router-dom";
+import { usersApiSlice } from "../users/userApiSlice";
 
 const PreFetch = () => {
     
     useEffect(()=>{
+        console.log("i am working bro")
         const notes = store.dispatch(notesApiSlice.endpoints.getNotes.initiate())
-        const users = store.dispatch(notesApiSlice.endpoints.getNotes.initiate())
+        const users = store.dispatch(usersApiSlice.endpoints.getUsers.initiate())
         
         
         return() =>{

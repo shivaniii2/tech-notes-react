@@ -3,10 +3,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave } from "@fortawesome/free-solid-svg-icons"
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Roles } from "../../config.js/roles"
+import { ROLES } from "../../config/roles"
 
 
-const USER_REGEX =  /^[A-z]{3-20}$/
+const USER_REGEX =  /^[A-z]{3,20}$/
 // Its a regex for username that forces string between A to z that can be 3 to 20 characters long
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/
 
@@ -54,7 +54,7 @@ const onUsernameChanged = e => setUsername(e.target.value)
 const onPasswordChanged = e => setPassword(e.target.value)
 
 const onRolesChanged = (e) => {
-  const value = Array.from(e.target.selectOptions , (option) => option.value)
+  const value = Array.from(e.target.selectedOptions , (option) => option.value)
   setRoles(value)
 }
 // Here e.target.selectedOptions gives an array-like object containing all the options that have been selected by the user.Array.from() is a method that converts array-like objects (such as e.target.selectedOptions) into a true array.
@@ -69,11 +69,11 @@ const onSaveUserClicked = async(e) => {
   }
 }
 
-const options = Object.values(Roles).map((role)=> {
+const options = Object.values(ROLES).map((role)=> {
  return(
- <options key={role} value={role}>
+ <option key={role} value={role}>
     {role}
-  </options>
+  </option>
  )
 })
 

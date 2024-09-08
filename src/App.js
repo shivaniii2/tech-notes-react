@@ -26,7 +26,7 @@ function App() {
           
       },
       {
-        path:'/login',
+        path:'login',
         element: <Login/>
       },
       {
@@ -54,6 +54,7 @@ function App() {
                   {
                     path : 'new',
                     element : <NewNote/>
+                    
                   
                   }
                 ]
@@ -91,10 +92,9 @@ function App() {
   ])
   
   return (
-    <>
      
      <RouterProvider  router={appRouter}/>
-    </>
+
    
     
   );

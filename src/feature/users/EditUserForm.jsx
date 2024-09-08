@@ -4,9 +4,9 @@ import { useDeleteUserMutation } from "./userApiSlice"
 import { useEffect, useState } from "react"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave, faTrashCan } from "@fortawesome/free-solid-svg-icons"
-import { Roles } from '../../config.js/roles';
+import { ROLES } from "../../config/roles"
 
-const USER_REGEX = /^[A-z]{3-20}$/
+const USER_REGEX = /^[A-z]{3,20}$/
 const PWD_REGEX = /^[A-z0-9!@#$%]{4,12}$/
 
 
@@ -17,6 +17,7 @@ const EditUserForm = ({user}) => {
         isError,
         error
     }] = useUpdateUserMutation()
+    const navigate = useNavigate()
     
     const [deleteUser, {
         isSuccess :isDelSuccess ,
@@ -25,11 +26,10 @@ const EditUserForm = ({user}) => {
         
     }] = useDeleteUserMutation()
     
-    
-    const navigate = useNavigate()
-    const [userName , setUserName] = useState(user.username)
+
+    const [username , setUserName] = useState(user.username)
     const [password , setPassword] = useState('');
-    const [roles , setRoles] = useState(user.roles)
+    const [roles , setRoles] = useState(user.roles || [])
     const [active , setActive] = useState(user.active)
     const [ validUsername, setValidUsername] = useState(false)
     const [ validPasword, setValidPassword] = useState(false)
@@ -40,17 +40,17 @@ const EditUserForm = ({user}) => {
     } ,[password])
     
     useEffect(()=> {
-        setValidUsername(USER_REGEX.test(userName))
+        setValidUsername(USER_REGEX.test(username))
        
-    } ,[userName])
+    } ,[username])
     
     
     useEffect (()=> {
+        console.log(isSuccess)
        if(isDelSuccess || isSuccess)   {
         setUserName('')
         setPassword('')
         setRoles([])
-        navigate('/dash/users')
        } 
     }, [isDelSuccess, isSuccess , navigate ])
     
@@ -67,9 +67,13 @@ const EditUserForm = ({user}) => {
     
     const onSaveUserClick  = async() =>{
         if(password){
-            await updateUser({id : user.id ,password,roles,active})
+            await updateUser({id : user.id ,username, password,roles,active})
         }else{
-            await updateUser({id : user.id ,roles,active})
+            await updateUser({id : user.id ,username,roles,active})
+        }
+        
+        if(isSuccess){
+            navigate('/dash/users')
         }
         
     }
@@ -84,10 +88,11 @@ const EditUserForm = ({user}) => {
         
     }
     
-    const onRolesChanged  = e => {
+    const onRolesChanged  = (e) => {
+        console.log(Array.from(e.target.selectedOptions, option => option.value));
         const values  =  Array.from (
-            e.target.selectOptions, //  Use `selectedOptions` to get the selected options
-            (option) => option.value  // Map each option to its value
+            e.target.selectedOptions, //  Use `selectedOptions` to get the selected options
+            option => option.value  // Map each option to its value
         )
         setRoles(values)
         
@@ -105,7 +110,7 @@ const EditUserForm = ({user}) => {
 
      
      
-     const options = Object.values(Roles).map(role => {
+     const options = Object.values(ROLES).map(role => {
         return (
             <option 
             key={role}
@@ -147,7 +152,7 @@ const EditUserForm = ({user}) => {
                     name="username"
                     type="text"
                     autoComplete="off"
-                    value={userName}
+                    value={username}
                     onChange={onUsernameChanged}
                     
                     
@@ -187,14 +192,13 @@ const EditUserForm = ({user}) => {
                 ASSIGNED ROLES:</label>
                 
                 <select
-                
                 id="roles"
-                    name="roles"
-                    className={`form__select ${validRolesClass}`}
-                    multiple={true}
-                    size="3"
-                    value={roles}
-                    onChange={onRolesChanged}
+                name="roles"
+                className={`form__select ${validRolesClass}`}
+                 multiple = {true}
+                size="3"
+                value={roles}
+                onChange={onRolesChanged}
                 
                 >
                     {options}
