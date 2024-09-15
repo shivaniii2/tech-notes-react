@@ -32,11 +32,12 @@ const navigate = useNavigate()
   
   
   useEffect(() => {
-    if(isSuccess || isDelSuccess)
+    if(isSuccess || isDelSuccess){
     setTitle('')
     setText('')
     setUserId('')
     navigate('/dash/notes')
+    }
   }, [isSuccess , isDelSuccess , navigate])
   const errClass = (isError || isDelError) ? "errmsg" : "offscreen"
   const validTitleClass = !title ? "form__input--incomplete" : ''

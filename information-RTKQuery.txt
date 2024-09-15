@@ -288,3 +288,14 @@ const getUser = () => ({
 });
 Here, wrapping the object in parentheses tells JavaScript that you're returning an object and not starting a new function block. Now, the function will implicitly return the object.
 
+
+
+
+
+something we  should know :
+The DASH_REGEX = /^\/dash(\/)?$/ is a regular expression used to match a specific URL path. Let's break it down:
+
+^: Anchors the regex to the start of the string (in this case, the start of the URL path).
+\/dash: Matches the string /dash. The backslash (\) is used to escape the forward slash (/), as forward slashes have special meaning in regular expressions.
+(\/)?: This part of the regex is optional because of the ?. It means "match / if it exists, but it's not required." This allows the regex to match both /dash and /dash/ (with or without a trailing slash).
+$: Anchors the regex to the end of the string (in this case, the end of the URL path).
